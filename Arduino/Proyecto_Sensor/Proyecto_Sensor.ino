@@ -1,9 +1,7 @@
 #include <ESP8266WiFi.h>
  
-//const char* ssid = "Nombre_De_Red[BSSID]";
-//const char* password = "Password";
-const char* ssid = "AVG";
-const char* password = "DDDDDAAAAA00000DDDDDAAAAA00000";
+const char* ssid = "Nombre_De_Red[BSSID]";
+const char* password = "Password";
 
 int redLed = 5; //D1
 int greenLed = 0; //D3
