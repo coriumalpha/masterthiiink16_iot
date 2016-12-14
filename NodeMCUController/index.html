@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>NodeMCU Controller</title>
+		<meta name="viewport" content="width=device-width"> <!-- Tap delay -->
+		 <meta charset="UTF-8"> 
+		<script src="./js/jquery-3.1.1.min.js"></script>
+		<link rel="stylesheet" href="./css/bootstrap.min.css" >
+		<link rel="stylesheet" href="./css/bootstrap-theme.min.css">
+		<script src="./js/bootstrap.min.js" ></script>
+
+	</head>
+	<body>
+		<div id="pseudoBg"></div>
+		<div style="margin-top: 95px;"></div>
+
+		<div class="row">
+			<div class="col-md-6 col-md-push-3">
+			<h3>Controlador Red Inalámbrica de Sensores</h3>
+			<h4>Máster Thiiink 2016 - Módulo IoT - AvanGroup</h4>
+			<br>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Device Data</strong>
+					</div>
+					<div class="panel-body">
+					<div class="col-md-12">
+						 <form class="form-horizontal">
+							  <div class="form-group">
+							  	<div class="col-md-12">
+								    <label class="" for="ip">IP:</label>
+								    <input name="ip" type="text" class="form-control" id="ip">
+							    </div>
+							  </div>
+						</form>
+						</div>
+					</div>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>RGB LED Controller</strong>
+					</div>
+					<div class="panel-body">
+					<div class="col-md-12">
+						<div id="successAlert" class="alert alert-dismissible alert-success fade in">
+							<a id="closeAlert" class="close" aria-label="close">&times;</a>
+							<strong>Success!</strong>
+						</div>
+
+						 <form class="form-horizontal">
+							  <div class="form-group">
+							  	<div class="col-md-12">
+								    <label class="" for="color">Color:</label>
+								    <input name="color" type="color" class="form-control" id="color">
+								</div>
+							  </div>
+						</form>
+						</div>
+					</div>
+					<div class="panel-footer">
+					  	<div class="btn btn-block btn-info" id="send">Set!</div>
+					</div>
+				</div>
+			
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong id="autorefresh">Temperature Gauge</strong>
+					</div>
+					<div class="panel-body" style="text-align: center;">
+						<div class="col-md-12">
+							<h1 id="tempGauge">0</h1>
+						</div>
+					</div>
+					<div class="panel-footer">
+					  	<div class="btn btn-block btn-info" id="getTemp">Refresh!</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+	<script type="text/javascript">
+		var autorefresh = false;
+
+		$(function()
+		{
+			$("#successAlert").hide();
+		});
+
+		$("#closeAlert").click(function(e)
+		{
+			$("#successAlert").hide("slow");
+		});
+
+		$("#send").click(function(e)
+		{
+			e.preventDefault();
+			e.stopPropagation();
+			setColor = hexToRgb($("#color").val());
+			var url = "http://" + $("#ip").val() + "/?red=" + setColor.r + "&green=" + setColor.g + "&blue=" + setColor.b;
+			console.log(url);
+			$.ajax({
+			  url: url,
+			  success: function(result)
+			  {
+			  	if(result.operation == "success")
+			  	{
+			  		console.log(result);
+			  		$("#successAlert").show("fast");
+			  		setTimeout(function(){ $("#successAlert").hide("slow"); }, 3500);
+			  	}
+			  }
+			})
+		});
+
+		$("#getTemp").click(function(e)
+		{
+			e.preventDefault();
+			e.stopPropagation();
+			tempUpdater();
+		});
+
+		$("#autorefresh").dblclick(function()
+		{
+			autorefresh = true;
+			tempUpdater();
+		});
+
+		$("#color").on("input change", function() {
+			$("#pseudoBg").css("background-color", $("#color").val());
+			$("#pseudoBg").css("opacity", "0.5");
+
+		});
+
+		function tempUpdater()
+		{
+			var url = "http://" + $("#ip").val() + "/getTemp";
+			console.log(url);
+			$.ajax({
+			  url: url,
+			  success: function(result)
+			  {
+			  	console.log(result);
+			  	$("#tempGauge").html(result.analogReading + "&#176; C");
+			  	//$("#tempGauge").html(result.analogReading + " mV");
+			  	if(autorefresh)
+			  	{
+			  		$("#tempGauge").css("color", "#1e7995");
+			  		var refreshInterval = setInterval(tempUpdater, 4000);	  	
+			  	}
+			  }
+			});
+		}
+
+	function hexToRgb(hex) {
+	    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+	    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+	        return r + r + g + g + b + b;
+	    });
+
+	    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	    return result ? {
+	        r: parseInt(result[1], 16),
+	        g: parseInt(result[2], 16),
+	        b: parseInt(result[3], 16)
+	    } : null;
+	}
+
+	</script>
+	<style type="text/css">
+	#pseudoBg
+		{
+		    position:fixed;
+		    padding:0;
+		    margin:0;
+
+		    top:0;
+		    left:0;
+
+		    width: 100%;
+		    height: 100%;
+		    z-index: -99;
+		}
+	</style>
+</html>
