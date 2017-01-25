@@ -203,7 +203,7 @@ void statusIndicator(bool type)
       now = millis();
       while(millis() - now < 500)
       {
-        digitalWrite(greenLed, ledStatus);
+        digitalWrite(greenLed, (ledStatus) ? HIGH : LOW);
       }
       ledStatus = !ledStatus;
     }
@@ -216,7 +216,7 @@ void statusIndicator(bool type)
       now = millis();
       while(millis() - now < 500)
       {
-        digitalWrite(redLed, ledStatus);
+        digitalWrite(redLed, (ledStatus) ? HIGH : LOW);
       }
       ledStatus = !ledStatus;
     }
