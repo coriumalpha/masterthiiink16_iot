@@ -5,4 +5,4 @@
 
 ## Pinout Servomotor
 
-[[Proyectos/ServoPinout.jpg|alt=ServoPinout]]
+[[docs/Proyectos/ServoPinout.jpg|alt=ServoPinout]]
